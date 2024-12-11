@@ -23,27 +23,20 @@ newsheader={
 newsResp = rq.get(url=newsurl, headers=newsheader)
 newsSoup = BeautifulSoup(newsResp.content, 'html.parser')
 allnews= newsSoup.select('div[class="o-teaser-collection o-teaser-collection--stream"] > ul > li')
-allnews=[]
+
 for n in allnews:
     print(n)
     print()
     print()
-    
-    date= n.select_one('div[class="stream-card__date"] > time')
-    image = n.select_one('div[class="o-teaser__image-placeholder"] > img ')
+
+    date = n.select_one('div[class="stream-card__date"] > time')
     heading = n.select_one('div[class="o-teaser__heading"] > a')
     content = n.select_one('p[class="o-teaser__standfirst"] > a')
-
-    News = {
-        
-        'date': date,
-        'image': image,
-        'heading' : heading,
-        'content' : content,
-        
-     }
-
-    allnews.append(News)
-    News=pd.DataFrame(allnews)
-    News.to_csv('News.csv')
-
+    img = n.select_one('div[class="o-teaser__image-placeholder"] > img ')
+    newsData = {
+        'Date' : date.attrs['datetime'] if date else None,
+        'Heading' : heading.text.strip() if heading else None,
+        'Content' : content.text.strip() if content else None,
+        'imgAlt' :img.attrs['alt'] if img else None,
+        'imgUrl' : img.attrs['data-src'] if img else None
+    }
